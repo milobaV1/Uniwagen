@@ -1,0 +1,43 @@
+# Node modules
+/node_modules
+
+# Logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Environment variables
+.env
+
+# TypeScript build
+/dist
+/build
+
+# TypeORM migrations
+/migrations
+
+# TurboRepo build cache
+/.turbo
+
+# IDE specific files
+.idea/
+.vscode/
+
+# OS-specific files
+.DS_Store
+Thumbs.db
+
+# Next.js specific (if using in the future)
+.next/
+
+# Public directory build artifacts (if applicable)
+public/
+
+# PostgreSQL database files (if local dev)
+*.sql
+*.sqlite
+
+# Temporary files
+*.swp
+*~

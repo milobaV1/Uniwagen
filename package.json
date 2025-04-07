@@ -1,0 +1,20 @@
+{
+  "name": "campuscart",
+  "version": "0.0.1",
+  "description": "CampusCart is a PWA for students at PAU to buy and sell items within the campus. It offers a simple, secure platform for one-time sales, with a user-friendly interface that works seamlessly on mobile and desktop. Connect, list, and sell items easily!",
+  "main": "index.js",
+  "packageManager": "npm@10.9.0",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "dev": "turbo run dev",
+    "build": "turbo run build"
+  },
+  "author": "Michael Iloba",
+  "license": "MIT",
+  "devDependencies": {
+    "turbo": "^2.5.0"
+  },
+  "workspaces": [
+    "apps/*"
+  ]
+}
