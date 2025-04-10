@@ -1,13 +1,19 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+/* eslint-disable prettier/prettier */
+import { Controller, Get, Post, Body, Patch, Param, Delete, Query } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
-
+import { ApiBody, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
+@ApiTags('Users')
 @Controller('users')
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
-  @Post()
+  @Post('create')
+  @ApiOperation({ summary: 'Create a new user' })
+  @ApiBody({ type: CreateUserDto })
+  @ApiResponse({ status: 201, description: 'User successfully created.' })
+  @ApiResponse({ status: 400, description: 'Invalid input data.' })
   create(@Body() createUserDto: CreateUserDto) {
     return this.usersService.create(createUserDto);
   }
@@ -18,8 +24,18 @@ export class UsersController {
   }
 
   @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.usersService.findOne(+id);
+  findUserById(@Param('id') id: string) {
+    return this.usersService.findOne('id', id);
+  }
+
+  @Get('find')
+  async findUser(
+    @Query('email') email?: string,
+  ){
+    if (email) {
+      return this.usersService.findOne('email', email);
+    }
+    return null;
   }
 
   @Patch(':id')

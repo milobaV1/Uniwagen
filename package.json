@@ -12,9 +12,20 @@
   "author": "Michael Iloba",
   "license": "MIT",
   "devDependencies": {
+    "@types/passport-jwt": "^4.0.1",
+    "@types/passport-local": "^1.0.38",
     "turbo": "^2.5.0"
   },
   "workspaces": [
     "apps/*"
-  ]
+  ],
+  "dependencies": {
+    "@nestjs/jwt": "^11.0.0",
+    "@nestjs/passport": "^11.0.5",
+    "@nestjs/swagger": "^11.1.1",
+    "passport": "^0.7.0",
+    "passport-jwt": "^4.0.1",
+    "passport-local": "^1.0.0",
+    "swagger-ui-express": "^5.0.1"
+  }
 }
