@@ -9,7 +9,6 @@ import {
   BeforeUpdate,
   OneToMany,
 } from 'typeorm';
-import { IsEmail } from 'class-validator';
 import * as bcrypt from 'bcryptjs';
 import { Request } from 'src/modules/requests/entities/request.entity';
 

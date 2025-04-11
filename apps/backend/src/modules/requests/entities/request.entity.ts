@@ -4,8 +4,10 @@ import {
   Column,
   ManyToOne,
   CreateDateColumn,
+  Entity,
 } from 'typeorm';
 
+@Entity()
 export class Request {
   @PrimaryGeneratedColumn('uuid')
   id: string;

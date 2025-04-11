@@ -10,7 +10,7 @@ export enum Category {
   BOOKS = 'books',
 }
 
-@Entity
+@Entity()
 export class Listing {
   @PrimaryGeneratedColumn('uuid')
   id: string;
@@ -27,7 +27,7 @@ export class Listing {
   @Column({ type: 'enum', enum: Category })
   category: Category;
 
-  @Column()
+  @Column({ type: 'text', array: true, nullable: true })
   imageUrl: string[];
 
   @Column({ nullable: true })
