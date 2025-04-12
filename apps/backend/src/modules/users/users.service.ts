@@ -11,21 +11,17 @@ export class UsersService {
   constructor(
     @InjectRepository(User)
     private readonly userRepository: Repository<User>,
-  ){}
+  ) {}
 
   async create(createUserDto: CreateUserDto) {
-    const existingUser = await this.findOne(
-      'email',
-      createUserDto.email,
-    );
+    const existingUser = await this.findOne('email', createUserDto.email);
 
-    if(existingUser) throw new BadRequestException(`Student already exists`);
+    if (existingUser) throw new BadRequestException(`Student already exists`);
     const newUser = this.userRepository.create(createUserDto);
     const savedUser = await this.userRepository.save(newUser);
 
     const { password, ...rest } = savedUser;
     return rest;
-    
   }
 
   findAll() {
@@ -35,7 +31,7 @@ export class UsersService {
   async findOne(searchParam: 'email' | 'id', searchValue: string) {
     return await this.userRepository.findOne({
       where: { [searchParam]: searchValue },
-    })
+    });
   }
 
   update(id: number, updateUserDto: UpdateUserDto) {

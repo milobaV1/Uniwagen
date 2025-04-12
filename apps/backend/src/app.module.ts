@@ -8,6 +8,7 @@ import { ConfigModule } from '@nestjs/config';
 import { typeOrmConfigAsync } from './infrastructure/database.config';
 import { UsersModule } from './modules/users/users.module';
 import { ListingsModule } from './modules/listings/listings.module';
+import { MailerModule } from '@nestjs-modules/mailer';
 
 @Module({
   imports: [
@@ -16,6 +17,17 @@ import { ListingsModule } from './modules/listings/listings.module';
     AuthModule,
     UsersModule,
     ListingsModule,
+    MailerModule.forRoot({
+      transport: {
+        host: process.env.MAIL_HOST,
+        port: Number(process.env.MAIL_PORT),
+        secure: false, // true for 465, false for other ports
+        auth: {
+          user: process.env.MAIL_USER,
+          pass: process.env.MAIL_PASSWORD,
+        },
+      },
+    }),
   ],
   controllers: [AppController],
   providers: [AppService],
