@@ -24,7 +24,7 @@ export class ListingsController {
     return this.listingsService.create(createListingDto);
   }
 
-  @Get('/get-listing')
+  @Get('/get-listings')
   @ApiOperation({ summary: 'Get all listings' })
   findAll() {
     return this.listingsService.findAll();

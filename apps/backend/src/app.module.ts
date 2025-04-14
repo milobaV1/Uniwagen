@@ -19,12 +19,12 @@ import { MailerModule } from '@nestjs-modules/mailer';
     ListingsModule,
     MailerModule.forRoot({
       transport: {
-        host: process.env.MAIL_HOST,
-        port: Number(process.env.MAIL_PORT),
-        secure: false, // true for 465, false for other ports
+        host: process.env.EMAIL_HOST,
+        port: Number(process.env.EMAIL_PORT),
+        secure: false,
         auth: {
-          user: process.env.MAIL_USER,
-          pass: process.env.MAIL_PASSWORD,
+          user: process.env.EMAIL_USERNAME,
+          pass: process.env.EMAIL_PASSWORD,
         },
       },
     }),

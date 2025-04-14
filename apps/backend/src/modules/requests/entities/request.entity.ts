@@ -25,7 +25,6 @@ export class Request {
   budget: number;
 
   @ManyToOne(() => User, (user) => user.requests, {
-    eager: true,
     onDelete: 'CASCADE',
   })
   user: User;

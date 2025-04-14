@@ -12,6 +12,7 @@ import {
 import * as bcrypt from 'bcryptjs';
 import { Request } from 'src/modules/requests/entities/request.entity';
 import { Listing } from 'src/modules/listings/entities/listing.entity';
+import { Exclude } from 'class-transformer';
 
 @Entity()
 export class User {
@@ -34,6 +35,7 @@ export class User {
   profileImage: string;
 
   @Column()
+  @Exclude()
   password: string;
 
   @OneToMany(() => Request, (request) => request.user)

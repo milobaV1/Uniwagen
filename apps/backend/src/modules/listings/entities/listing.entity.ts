@@ -48,7 +48,6 @@ export class Listing {
   isSold: ListingStatus;
 
   @ManyToOne(() => User, (user) => user.listings, {
-    eager: true,
     onDelete: 'CASCADE',
   })
   user: User;
