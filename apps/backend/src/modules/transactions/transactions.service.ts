@@ -1,18 +1,31 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  Injectable,
+  NotFoundException,
+  ServiceUnavailableException,
+} from '@nestjs/common';
 import { InitializeTransactionDto } from './dto/initialize-transaction.dto';
 import {
+  PaystackCallbackDto,
   PaystackCreateTransactionDto,
   PaystackCreateTransactionResponseDto,
   PaystackMetadata,
+  PaystackVerifyTransactionResponseDto,
+  PaystackWebhookDto,
 } from './dto/paystack.dto';
-import { Transaction } from './entities/transaction.entity';
+import { PaymentStatus, Transaction } from './entities/transaction.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Listing } from '../listings/entities/listing.entity';
-import { Repository } from 'typeorm';
+import { Not, Repository } from 'typeorm';
 import { User } from '../users/entities/user.entity';
 import { ConfigService } from '@nestjs/config';
-import axios from 'axios';
-import { PAYSTACK_TRANSACTION_INI_URL } from 'src/core/constants/constants';
+import axios, { Axios, AxiosResponse } from 'axios';
+import {
+  PAYSTACK_SUCCESS_STATUS,
+  PAYSTACK_TRANSACTION_INI_URL,
+  PAYSTACK_TRANSACTION_VERIFY_BASE_URL,
+  PAYSTACK_WEBHOOK_CRYPTO_ALGO,
+} from 'src/core/constants/constants';
+import { createHmac, timingSafeEqual } from 'crypto';
 
 @Injectable()
 export class TransactionsService {
@@ -45,17 +58,17 @@ export class TransactionsService {
     if (!user) throw new NotFoundException('Not a user');
 
     const metadata: PaystackMetadata = {
-      userId: userId,
-      listingId: listingId,
-      customFields: [
+      user_id: userId,
+      listing_id: listingId,
+      custom_fields: [
         {
-          displayName: 'Name',
-          variableName: 'name',
+          display_name: 'Name',
+          variable_name: 'name',
           value: user.firstName,
         },
         {
-          displayName: 'Email',
-          variableName: 'email',
+          display_name: 'Email',
+          variable_name: 'email',
           value: user.email,
         },
       ],
@@ -69,7 +82,7 @@ export class TransactionsService {
 
     const paystackCallbackUrl = this.configService.get('PAYSTACK_CALLBACK_URL');
     if (paystackCallbackUrl) {
-      paystackCreateTransactionDto.callbackUrl = paystackCallbackUrl;
+      paystackCreateTransactionDto.callback_url = paystackCallbackUrl;
     }
 
     const payload = JSON.stringify(paystackCreateTransactionDto);
@@ -89,6 +102,7 @@ export class TransactionsService {
         },
       );
       result = response.data;
+      console.log(result);
     } catch (error) {
       console.error('Error initializing transaction:', error);
     }
@@ -97,7 +111,7 @@ export class TransactionsService {
     if (result?.status === true) {
       const transaction = this.transactionRepository.create({
         transactionReference: data?.reference,
-        paymentLink: data?.authorizationUrl,
+        paymentLink: data?.authorization_url,
         listingId: listing.id,
       });
 
@@ -106,5 +120,103 @@ export class TransactionsService {
     return null;
   }
 
-  async verifyTransaction() {}
+  async verifyTransaction(
+    dto: PaystackCallbackDto,
+  ): Promise<Transaction | null> {
+    const transaction = await this.transactionRepository.findOne({
+      where: {
+        transactionReference: dto.reference,
+      },
+    });
+
+    if (!transaction) throw new NotFoundException('Transaction not found');
+
+    const reference = transaction.transactionReference;
+    const url = `${PAYSTACK_TRANSACTION_VERIFY_BASE_URL}/${reference}`;
+    let response: AxiosResponse<PaystackVerifyTransactionResponseDto> | null =
+      null;
+
+    try {
+      response = await axios.get<PaystackVerifyTransactionResponseDto>(url, {
+        headers: {
+          Authorization: `Bearer ${this.configService.get<string>(
+            'PAYSTACK_SECRET_KEY',
+          )}`,
+        },
+      });
+    } catch (error) {
+      console.error(error);
+    }
+
+    if (!response) {
+      console.log('No response');
+
+      return null;
+    }
+    const result = response.data;
+    console.log(result);
+    if (!result?.status || !result?.data)
+      throw new Error('Failed to verify transaction from Paystack');
+
+    const transactionStatus = result.data.status;
+    const paymentConfirmed = transactionStatus === PAYSTACK_SUCCESS_STATUS;
+    if (paymentConfirmed) {
+      transaction.status = PaymentStatus.PAID;
+    } else {
+      transaction.status = PaymentStatus.NOTPAID;
+    }
+
+    transaction.transactionStatus = transactionStatus;
+
+    return await this.transactionRepository.save(transaction);
+  }
+
+  async handlePaystackWebhook(
+    dto: PaystackWebhookDto,
+    signature: string,
+  ): Promise<boolean> {
+    if (!dto.data) return false;
+
+    let isValidEvent: boolean = false;
+
+    try {
+      const hash = createHmac(
+        PAYSTACK_WEBHOOK_CRYPTO_ALGO,
+        this.configService.get<string>('PAYSTACK_SECRET_KEY') || '',
+      )
+        .update(JSON.stringify(dto))
+        .digest('hex');
+
+      isValidEvent = !!(
+        hash &&
+        signature &&
+        timingSafeEqual(Buffer.from(hash), Buffer.from(signature))
+      );
+    } catch (error) {
+      console.error(error);
+    }
+    if (!isValidEvent) return false;
+
+    const transaction = await this.transactionRepository.findOne({
+      where: {
+        transactionReference: dto.data.reference,
+      },
+    });
+
+    if (!transaction) throw new NotFoundException('transaction not found');
+
+    const transactionStatus = dto.data.status;
+    const paymentConfirmed = transactionStatus === PAYSTACK_SUCCESS_STATUS;
+
+    if (paymentConfirmed) {
+      transaction.status = PaymentStatus.PAID;
+    } else {
+      transaction.status = PaymentStatus.NOTPAID;
+    }
+
+    transaction.transactionStatus = transactionStatus || 'UNKNOWN';
+
+    await this.transactionRepository.save(transaction);
+    return true;
+  }
 }

@@ -1,28 +1,30 @@
+import { IsNotEmpty, IsOptional, IsString } from 'class-validator';
+
 /* eslint-disable prettier/prettier */
 export type PaystackCreateTransactionDto = {
   amount: number;
   email: string;
-  callbackUrl?: string;
+  callback_url?: string;
   metadata: PaystackMetadata;
 };
 
 export type PaystackMetadata = {
-  userId: string;
-  listingId: string;
-  callbackUrl?: string;
-  customFields: PaystackMetadataCustomField[];
+  user_id: string;
+  listing_id: string;
+  callback_url?: string;
+  custom_fields: PaystackMetadataCustomField[];
 };
 
 export type PaystackMetadataCustomField = {
-  displayName: string;
-  variableName: string;
+  display_name: string;
+  variable_name: string;
   value: string | number;
 };
 
 export type PaystackCreateTransactionResponseDto = {
   status: boolean;
   message: string;
-  data: { authorizationUrl: string; accessCode: string; reference: string };
+  data: { authorization_url: string; access_code: string; reference: string };
 };
 
 export type PaystackVerifyTransactionResponseDto = {
@@ -46,12 +48,12 @@ export type Data = {
   reference?: string;
   amount?: number;
 
-  gatewayResponse?: string;
-  paidAt?: string;
-  createdAt?: string;
+  gateway_response?: string;
+  paid_at?: string;
+  created_at?: string;
   channel?: string;
   currency?: string;
-  ipAddress?: string;
+  ip_address?: string;
   metadata?: any;
 
   message?: any;
@@ -63,5 +65,11 @@ export type Data = {
 };
 
 export class PaystackCallbackDto {
+  @IsString()
+  @IsNotEmpty()
   reference: string;
+
+  @IsOptional()
+  @IsString()
+  trxref?: string;
 }

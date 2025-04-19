@@ -1,6 +1,6 @@
 import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
 
-export enum TransactionStatus {
+export enum PaymentStatus {
   PAID = 'paid',
   PENDING = 'pending',
   NOTPAID = 'notpaid',
@@ -17,15 +17,15 @@ export class Transaction {
   @Column()
   paymentLink: string;
 
-  @Column()
+  @Column({ nullable: true })
   transactionStatus: string;
 
   @Column({
     type: 'enum',
-    enum: TransactionStatus,
-    default: TransactionStatus.NOTPAID,
+    enum: PaymentStatus,
+    default: PaymentStatus.NOTPAID,
   })
-  status: TransactionStatus;
+  status: PaymentStatus;
 
   @Column()
   listingId: string;
