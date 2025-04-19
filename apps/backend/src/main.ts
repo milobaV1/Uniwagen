@@ -4,6 +4,7 @@ import { AppModule } from './app.module';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { AllExceptionsFilter } from './core/filters/http-exception.filter';
 import { ValidationPipe } from '@nestjs/common';
+import ngrok from '@ngrok/ngrok';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
@@ -31,5 +32,11 @@ async function bootstrap() {
   app.useGlobalFilters(new AllExceptionsFilter());
   app.enableCors();
   await app.listen(process.env.PORT ?? 3000);
+
+  // const listener = await ngrok.forward({
+  //   addr: 3001,
+  //   authtoken_from_env: true,
+  // });
+  // console.log(`Ingress established at: ${listener.url()}`);
 }
 bootstrap();

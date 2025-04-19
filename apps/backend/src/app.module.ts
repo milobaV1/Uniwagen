@@ -9,6 +9,7 @@ import { typeOrmConfigAsync } from './infrastructure/database.config';
 import { UsersModule } from './modules/users/users.module';
 import { ListingsModule } from './modules/listings/listings.module';
 import { MailerModule } from '@nestjs-modules/mailer';
+import { TransactionsModule } from './modules/transactions/transactions.module';
 
 @Module({
   imports: [
@@ -17,6 +18,7 @@ import { MailerModule } from '@nestjs-modules/mailer';
     AuthModule,
     UsersModule,
     ListingsModule,
+    TransactionsModule,
     MailerModule.forRoot({
       transport: {
         host: process.env.EMAIL_HOST,

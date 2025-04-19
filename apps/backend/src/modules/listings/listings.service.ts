@@ -4,8 +4,9 @@ import { CreateListingDto } from './dto/create-listing.dto';
 import { UpdateListingDto } from './dto/update-listing.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Listing, ListingStatus } from './entities/listing.entity';
-import { Repository } from 'typeorm';
+import { Brackets, FindOptionsWhere, Repository } from 'typeorm';
 import { User } from '../users/entities/user.entity';
+import { FilterListingDto } from './dto/filter-listing.dto';
 
 @Injectable()
 export class ListingsService {
@@ -69,6 +70,12 @@ export class ListingsService {
         },
       },
       relations: ['user'],
+      // select: {
+      //   firstName: true,
+      //   lastName: true,
+      //   email: true,
+      //   phone: true
+      // }
     });
     console.log(listing);
 
@@ -92,5 +99,61 @@ export class ListingsService {
     if (!listing) throw new NotFoundException('Listing not found');
     await this.listingRepository.delete(id);
     return listing;
+  }
+  async filter2(filterListingDto: FilterListingDto) {
+    const { title, description, price, category } = filterListingDto;
+    const conditions: FindOptionsWhere<Listing> | FindOptionsWhere<Listing>[] =
+      {
+        ...(title ? { title } : {}),
+        ...(description ? { description } : {}),
+        ...(price ? { price } : {}),
+        ...(category ? { category } : {}),
+      };
+
+    return await this.listingRepository.find({
+      where: conditions,
+    });
+  }
+  async filter(filterListingDto: FilterListingDto) {
+    const { title, description, price, category, search } = filterListingDto;
+    const queryBuilder = this.listingRepository.createQueryBuilder('listing');
+    if (search) {
+      queryBuilder.andWhere(
+        new Brackets((qb) => {
+          qb.where('LOWER(listing.title) LIKE LOWER(:search)', {
+            search: `%${search}%`,
+          })
+            .orWhere('LOWER(listing.description) LIKE LOWER(:search)', {
+              search: `%${search}%`,
+            })
+            .orWhere('CAST(listing.price AS TEXT) LIKE :search', {
+              search: `%${search}%`,
+            })
+            .orWhere(
+              'LOWER(CAST(listing.category AS TEXT)) LIKE LOWER(:search)',
+              {
+                search: `%${search}%`,
+              },
+            );
+        }),
+      );
+    }
+
+    if (title) {
+      queryBuilder.andWhere('listing.title = :title', { title });
+    }
+    if (description) {
+      queryBuilder.andWhere('listing.description = :description', {
+        description,
+      });
+    }
+    if (price) {
+      queryBuilder.andWhere('listing.price = :price', { price });
+    }
+    if (category) {
+      queryBuilder.andWhere('listing.category = :category', { category });
+    }
+
+    return queryBuilder.getMany();
   }
 }

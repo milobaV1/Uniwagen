@@ -6,11 +6,13 @@ import {
   Patch,
   Param,
   Delete,
+  Query,
 } from '@nestjs/common';
 import { ListingsService } from './listings.service';
 import { CreateListingDto } from './dto/create-listing.dto';
 import { UpdateListingDto } from './dto/update-listing.dto';
 import { ApiTags, ApiOperation, ApiParam, ApiBody } from '@nestjs/swagger';
+import { FilterListingDto } from './dto/filter-listing.dto';
 
 @ApiTags('Listings')
 @Controller('listings')
@@ -56,5 +58,11 @@ export class ListingsController {
   @ApiParam({ name: 'id', type: String })
   remove(@Param('id') id: string) {
     return this.listingsService.remove(id);
+  }
+
+  @Get('search-and-filter')
+  @ApiOperation({ summary: 'Search for listing' })
+  filter(@Query() query: FilterListingDto) {
+    return this.listingsService.filter(query);
   }
 }
