@@ -13,9 +13,9 @@ import { createFileRoute } from '@tanstack/react-router'
 // Import Routes
 
 import { Route as rootRoute } from './routes/__root'
+import { Route as userIndexImport } from './routes/(user)/index'
 import { Route as userLayoutImport } from './routes/(user)/_layout'
 import { Route as userAuthenticatedImport } from './routes/(user)/_authenticated'
-import { Route as userLayoutIndexImport } from './routes/(user)/_layout/index'
 import { Route as userLayoutauthSignUpImport } from './routes/(user)/_layout/(auth)/sign-up'
 import { Route as userLayoutauthLoginImport } from './routes/(user)/_layout/(auth)/login'
 import { Route as userAuthenticatedhomeLayoutImport } from './routes/(user)/_authenticated/(home)/_layout'
@@ -35,6 +35,12 @@ const userRoute = userImport.update({
   getParentRoute: () => rootRoute,
 } as any)
 
+const userIndexRoute = userIndexImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => userRoute,
+} as any)
+
 const userLayoutRoute = userLayoutImport.update({
   id: '/_layout',
   getParentRoute: () => userRoute,
@@ -48,12 +54,6 @@ const userAuthenticatedRoute = userAuthenticatedImport.update({
 const userAuthenticatedhomeRoute = userAuthenticatedhomeImport.update({
   id: '/(home)',
   getParentRoute: () => userAuthenticatedRoute,
-} as any)
-
-const userLayoutIndexRoute = userLayoutIndexImport.update({
-  id: '/',
-  path: '/',
-  getParentRoute: () => userLayoutRoute,
 } as any)
 
 const userLayoutauthSignUpRoute = userLayoutauthSignUpImport.update({
@@ -106,12 +106,12 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof userLayoutImport
       parentRoute: typeof userImport
     }
-    '/(user)/_layout/': {
-      id: '/(user)/_layout/'
+    '/(user)/': {
+      id: '/(user)/'
       path: '/'
       fullPath: '/'
-      preLoaderRoute: typeof userLayoutIndexImport
-      parentRoute: typeof userLayoutImport
+      preLoaderRoute: typeof userIndexImport
+      parentRoute: typeof userImport
     }
     '/(user)/_authenticated/(home)': {
       id: '/(user)/_authenticated/(home)'
@@ -193,13 +193,11 @@ const userAuthenticatedRouteWithChildren =
   userAuthenticatedRoute._addFileChildren(userAuthenticatedRouteChildren)
 
 interface userLayoutRouteChildren {
-  userLayoutIndexRoute: typeof userLayoutIndexRoute
   userLayoutauthLoginRoute: typeof userLayoutauthLoginRoute
   userLayoutauthSignUpRoute: typeof userLayoutauthSignUpRoute
 }
 
 const userLayoutRouteChildren: userLayoutRouteChildren = {
-  userLayoutIndexRoute: userLayoutIndexRoute,
   userLayoutauthLoginRoute: userLayoutauthLoginRoute,
   userLayoutauthSignUpRoute: userLayoutauthSignUpRoute,
 }
@@ -211,11 +209,13 @@ const userLayoutRouteWithChildren = userLayoutRoute._addFileChildren(
 interface userRouteChildren {
   userAuthenticatedRoute: typeof userAuthenticatedRouteWithChildren
   userLayoutRoute: typeof userLayoutRouteWithChildren
+  userIndexRoute: typeof userIndexRoute
 }
 
 const userRouteChildren: userRouteChildren = {
   userAuthenticatedRoute: userAuthenticatedRouteWithChildren,
   userLayoutRoute: userLayoutRouteWithChildren,
+  userIndexRoute: userIndexRoute,
 }
 
 const userRouteWithChildren = userRoute._addFileChildren(userRouteChildren)
@@ -229,6 +229,7 @@ export interface FileRoutesByFullPath {
 }
 
 export interface FileRoutesByTo {
+  '': typeof userLayoutRouteWithChildren
   '/': typeof userAuthenticatedhomeLayoutRouteWithChildren
   '/login': typeof userLayoutauthLoginRoute
   '/sign-up': typeof userLayoutauthSignUpRoute
@@ -240,7 +241,7 @@ export interface FileRoutesById {
   '/(user)': typeof userRouteWithChildren
   '/(user)/_authenticated': typeof userAuthenticatedRouteWithChildren
   '/(user)/_layout': typeof userLayoutRouteWithChildren
-  '/(user)/_layout/': typeof userLayoutIndexRoute
+  '/(user)/': typeof userIndexRoute
   '/(user)/_authenticated/(home)': typeof userAuthenticatedhomeRouteWithChildren
   '/(user)/_authenticated/(home)/_layout': typeof userAuthenticatedhomeLayoutRouteWithChildren
   '/(user)/_layout/(auth)/login': typeof userLayoutauthLoginRoute
@@ -252,13 +253,13 @@ export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths: '/' | '' | '/login' | '/sign-up' | '/home'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/login' | '/sign-up' | '/home'
+  to: '' | '/' | '/login' | '/sign-up' | '/home'
   id:
     | '__root__'
     | '/(user)'
     | '/(user)/_authenticated'
     | '/(user)/_layout'
-    | '/(user)/_layout/'
+    | '/(user)/'
     | '/(user)/_authenticated/(home)'
     | '/(user)/_authenticated/(home)/_layout'
     | '/(user)/_layout/(auth)/login'
@@ -292,7 +293,8 @@ export const routeTree = rootRoute
       "filePath": "(user)",
       "children": [
         "/(user)/_authenticated",
-        "/(user)/_layout"
+        "/(user)/_layout",
+        "/(user)/"
       ]
     },
     "/(user)/_authenticated": {
@@ -306,14 +308,13 @@ export const routeTree = rootRoute
       "filePath": "(user)/_layout.tsx",
       "parent": "/(user)",
       "children": [
-        "/(user)/_layout/",
         "/(user)/_layout/(auth)/login",
         "/(user)/_layout/(auth)/sign-up"
       ]
     },
-    "/(user)/_layout/": {
-      "filePath": "(user)/_layout/index.tsx",
-      "parent": "/(user)/_layout"
+    "/(user)/": {
+      "filePath": "(user)/index.tsx",
+      "parent": "/(user)"
     },
     "/(user)/_authenticated/(home)": {
       "filePath": "(user)/_authenticated/(home)",
