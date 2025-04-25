@@ -5,14 +5,13 @@ import LandingHome from "@/modules/users/features/home/landing-home";
 import { createFileRoute } from "@tanstack/react-router";
 
 export const Route = createFileRoute("/(user)/")({
-  component: RouteComponent,
+  component: LandingHome,
 });
 
 function RouteComponent() {
   return (
     <div className="flex gap-5">
       <Sidebar />
-      <ListingCard />
     </div>
   );
 }

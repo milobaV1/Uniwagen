@@ -20,6 +20,8 @@ import { Route as userLayoutauthSignUpImport } from './routes/(user)/_layout/(au
 import { Route as userLayoutauthLoginImport } from './routes/(user)/_layout/(auth)/login'
 import { Route as userAuthenticatedhomeLayoutImport } from './routes/(user)/_authenticated/(home)/_layout'
 import { Route as userAuthenticatedhomeLayoutHomeImport } from './routes/(user)/_authenticated/(home)/_layout/home'
+import { Route as userAuthenticatedhomeLayoutListingIndexImport } from './routes/(user)/_authenticated/(home)/_layout/listing/index'
+import { Route as userAuthenticatedhomeLayoutListingIdImport } from './routes/(user)/_authenticated/(home)/_layout/listing/$id'
 
 // Create Virtual Routes
 
@@ -78,6 +80,20 @@ const userAuthenticatedhomeLayoutHomeRoute =
   userAuthenticatedhomeLayoutHomeImport.update({
     id: '/home',
     path: '/home',
+    getParentRoute: () => userAuthenticatedhomeLayoutRoute,
+  } as any)
+
+const userAuthenticatedhomeLayoutListingIndexRoute =
+  userAuthenticatedhomeLayoutListingIndexImport.update({
+    id: '/listing/',
+    path: '/listing/',
+    getParentRoute: () => userAuthenticatedhomeLayoutRoute,
+  } as any)
+
+const userAuthenticatedhomeLayoutListingIdRoute =
+  userAuthenticatedhomeLayoutListingIdImport.update({
+    id: '/listing/$id',
+    path: '/listing/$id',
     getParentRoute: () => userAuthenticatedhomeLayoutRoute,
   } as any)
 
@@ -148,6 +164,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof userAuthenticatedhomeLayoutHomeImport
       parentRoute: typeof userAuthenticatedhomeLayoutImport
     }
+    '/(user)/_authenticated/(home)/_layout/listing/$id': {
+      id: '/(user)/_authenticated/(home)/_layout/listing/$id'
+      path: '/listing/$id'
+      fullPath: '/listing/$id'
+      preLoaderRoute: typeof userAuthenticatedhomeLayoutListingIdImport
+      parentRoute: typeof userAuthenticatedhomeLayoutImport
+    }
+    '/(user)/_authenticated/(home)/_layout/listing/': {
+      id: '/(user)/_authenticated/(home)/_layout/listing/'
+      path: '/listing'
+      fullPath: '/listing'
+      preLoaderRoute: typeof userAuthenticatedhomeLayoutListingIndexImport
+      parentRoute: typeof userAuthenticatedhomeLayoutImport
+    }
   }
 }
 
@@ -155,11 +185,17 @@ declare module '@tanstack/react-router' {
 
 interface userAuthenticatedhomeLayoutRouteChildren {
   userAuthenticatedhomeLayoutHomeRoute: typeof userAuthenticatedhomeLayoutHomeRoute
+  userAuthenticatedhomeLayoutListingIdRoute: typeof userAuthenticatedhomeLayoutListingIdRoute
+  userAuthenticatedhomeLayoutListingIndexRoute: typeof userAuthenticatedhomeLayoutListingIndexRoute
 }
 
 const userAuthenticatedhomeLayoutRouteChildren: userAuthenticatedhomeLayoutRouteChildren =
   {
     userAuthenticatedhomeLayoutHomeRoute: userAuthenticatedhomeLayoutHomeRoute,
+    userAuthenticatedhomeLayoutListingIdRoute:
+      userAuthenticatedhomeLayoutListingIdRoute,
+    userAuthenticatedhomeLayoutListingIndexRoute:
+      userAuthenticatedhomeLayoutListingIndexRoute,
   }
 
 const userAuthenticatedhomeLayoutRouteWithChildren =
@@ -226,6 +262,8 @@ export interface FileRoutesByFullPath {
   '/login': typeof userLayoutauthLoginRoute
   '/sign-up': typeof userLayoutauthSignUpRoute
   '/home': typeof userAuthenticatedhomeLayoutHomeRoute
+  '/listing/$id': typeof userAuthenticatedhomeLayoutListingIdRoute
+  '/listing': typeof userAuthenticatedhomeLayoutListingIndexRoute
 }
 
 export interface FileRoutesByTo {
@@ -234,6 +272,8 @@ export interface FileRoutesByTo {
   '/login': typeof userLayoutauthLoginRoute
   '/sign-up': typeof userLayoutauthSignUpRoute
   '/home': typeof userAuthenticatedhomeLayoutHomeRoute
+  '/listing/$id': typeof userAuthenticatedhomeLayoutListingIdRoute
+  '/listing': typeof userAuthenticatedhomeLayoutListingIndexRoute
 }
 
 export interface FileRoutesById {
@@ -247,13 +287,22 @@ export interface FileRoutesById {
   '/(user)/_layout/(auth)/login': typeof userLayoutauthLoginRoute
   '/(user)/_layout/(auth)/sign-up': typeof userLayoutauthSignUpRoute
   '/(user)/_authenticated/(home)/_layout/home': typeof userAuthenticatedhomeLayoutHomeRoute
+  '/(user)/_authenticated/(home)/_layout/listing/$id': typeof userAuthenticatedhomeLayoutListingIdRoute
+  '/(user)/_authenticated/(home)/_layout/listing/': typeof userAuthenticatedhomeLayoutListingIndexRoute
 }
 
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '' | '/login' | '/sign-up' | '/home'
+  fullPaths:
+    | '/'
+    | ''
+    | '/login'
+    | '/sign-up'
+    | '/home'
+    | '/listing/$id'
+    | '/listing'
   fileRoutesByTo: FileRoutesByTo
-  to: '' | '/' | '/login' | '/sign-up' | '/home'
+  to: '' | '/' | '/login' | '/sign-up' | '/home' | '/listing/$id' | '/listing'
   id:
     | '__root__'
     | '/(user)'
@@ -265,6 +314,8 @@ export interface FileRouteTypes {
     | '/(user)/_layout/(auth)/login'
     | '/(user)/_layout/(auth)/sign-up'
     | '/(user)/_authenticated/(home)/_layout/home'
+    | '/(user)/_authenticated/(home)/_layout/listing/$id'
+    | '/(user)/_authenticated/(home)/_layout/listing/'
   fileRoutesById: FileRoutesById
 }
 
@@ -327,7 +378,9 @@ export const routeTree = rootRoute
       "filePath": "(user)/_authenticated/(home)/_layout.tsx",
       "parent": "/(user)/_authenticated/(home)",
       "children": [
-        "/(user)/_authenticated/(home)/_layout/home"
+        "/(user)/_authenticated/(home)/_layout/home",
+        "/(user)/_authenticated/(home)/_layout/listing/$id",
+        "/(user)/_authenticated/(home)/_layout/listing/"
       ]
     },
     "/(user)/_layout/(auth)/login": {
@@ -340,6 +393,14 @@ export const routeTree = rootRoute
     },
     "/(user)/_authenticated/(home)/_layout/home": {
       "filePath": "(user)/_authenticated/(home)/_layout/home.tsx",
+      "parent": "/(user)/_authenticated/(home)/_layout"
+    },
+    "/(user)/_authenticated/(home)/_layout/listing/$id": {
+      "filePath": "(user)/_authenticated/(home)/_layout/listing/$id.tsx",
+      "parent": "/(user)/_authenticated/(home)/_layout"
+    },
+    "/(user)/_authenticated/(home)/_layout/listing/": {
+      "filePath": "(user)/_authenticated/(home)/_layout/listing/index.tsx",
       "parent": "/(user)/_authenticated/(home)/_layout"
     }
   }

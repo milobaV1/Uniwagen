@@ -1,13 +1,6 @@
 import { axiosClient } from "@/lib/api/axios-instance";
-import { UserSignUpInterface } from "../interface";
-
-type SignUpResponse = {
-  firstName: string;
-  lastName: string;
-  email: string;
-  phone: string;
-  profileImage: string;
-};
+import { UserSignUpInterface } from "@/services/interfaces/auth.interface";
+import { SignUpResponse } from "@/services/types/auth.type";
 
 export async function createUser(
   data: UserSignUpInterface

@@ -1,9 +1,6 @@
 import { axiosClient } from "@/lib/api/axios-instance";
-import { LoginInterface } from "../interface";
-
-type LoginResponse = {
-  access_token: string;
-};
+import { LoginInterface } from "@/services/interfaces/auth.interface";
+import { LoginResponse } from "@/services/types/auth.type";
 
 export async function getLogin(
   data: LoginInterface

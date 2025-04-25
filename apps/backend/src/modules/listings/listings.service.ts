@@ -1,5 +1,9 @@
 /* eslint-disable prettier/prettier */
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { CreateListingDto } from './dto/create-listing.dto';
 import { UpdateListingDto } from './dto/update-listing.dto';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -155,5 +159,23 @@ export class ListingsService {
     }
 
     return queryBuilder.getMany();
+  }
+  async handleFileUpload(file: Express.Multer.File, listingId: string) {
+    console.log('Uploaded file:', file);
+
+    if (!listingId) throw new BadRequestException('Listing ID required');
+    const listing = await this.findOne(listingId);
+    if (!listing) throw new NotFoundException('Listing does not exist');
+    const updatedImageUrl = [
+      ...(listing.imageUrl || []),
+      `/uploads/${file.filename}`,
+    ];
+    await this.update(listingId, {
+      imageUrl: updatedImageUrl,
+    });
+    return {
+      message: 'File Uploaded successfully and listing updated',
+      file: `/uploads/${file.filename}`,
+    };
   }
 }

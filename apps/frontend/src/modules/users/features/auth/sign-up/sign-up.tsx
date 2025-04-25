@@ -16,8 +16,8 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { UserSignUpInterface } from "./interface";
 import { createUser } from "./api/user-sign-up";
+import { UserSignUpInterface } from "@/services/interfaces/auth.interface";
 
 const formSchema = z
   .object({

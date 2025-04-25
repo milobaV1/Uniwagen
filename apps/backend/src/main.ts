@@ -4,11 +4,17 @@ import { AppModule } from './app.module';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { AllExceptionsFilter } from './core/filters/http-exception.filter';
 import { ValidationPipe } from '@nestjs/common';
+import { join } from 'path';
+import { existsSync, mkdirSync } from 'fs';
+import * as express from 'express';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
 
   app.setGlobalPrefix('v1');
+  const uploadDir = join(process.cwd(), 'uploads');
+  if (!existsSync(uploadDir)) mkdirSync(uploadDir);
+  app.use('/uploads', express.static(join(process.cwd(), 'uploads')));
   const config = new DocumentBuilder()
     .setTitle('UNKNOWN APIs')
     .setDescription(

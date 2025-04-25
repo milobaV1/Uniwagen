@@ -16,8 +16,13 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { LoginInterface } from "./interface";
 import { getLogin } from "./api/user-login";
+import { LoginInterface } from "@/services/interfaces/auth.interface";
+import { decodeToken } from "@/lib/token/decode-token";
+import { DecodedToken, useAuthState } from "@/stores/auth.store";
+import { getUser } from "./api/get-user";
+import { useNavigate } from "@tanstack/react-router";
+//import { useRouter } from "@tanstack/react-router";
 
 const formSchema = z.object({
   email: z
@@ -39,7 +44,9 @@ export function UserLogin() {
       password: "",
     },
   });
-
+  const { setUser, setAuthToken, setDecodedToken } = useAuthState();
+  //const router = useRouter();
+  const navigate = useNavigate();
   async function onSubmit(values: z.infer<typeof formSchema>) {
     console.log(values);
     toast(`Login attempt with email: ${values.email}`);
@@ -47,6 +54,17 @@ export function UserLogin() {
     console.log("here");
     const token = await getLogin(data);
     console.log("This is the token", token);
+    if (token) {
+      const payload = decodeToken(
+        token.access_token
+      ) as unknown as DecodedToken;
+      const user = await getUser(payload.sub.id);
+      if (user) setUser(user);
+      setAuthToken(token.access_token);
+      setDecodedToken(payload as unknown as DecodedToken);
+      //router.history.push();
+      navigate({ to: "/home" });
+    }
   }
 
   return (

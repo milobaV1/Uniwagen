@@ -7,12 +7,21 @@ import {
   Param,
   Delete,
   Query,
+  UploadedFile,
+  UseInterceptors,
 } from '@nestjs/common';
 import { ListingsService } from './listings.service';
 import { CreateListingDto } from './dto/create-listing.dto';
 import { UpdateListingDto } from './dto/update-listing.dto';
-import { ApiTags, ApiOperation, ApiParam, ApiBody } from '@nestjs/swagger';
+import {
+  ApiTags,
+  ApiOperation,
+  ApiParam,
+  ApiBody,
+  ApiConsumes,
+} from '@nestjs/swagger';
 import { FilterListingDto } from './dto/filter-listing.dto';
+import { FileInterceptor } from '@nestjs/platform-express';
 
 @ApiTags('Listings')
 @Controller('listings')
@@ -64,5 +73,30 @@ export class ListingsController {
   @ApiOperation({ summary: 'Search for listing' })
   filter(@Query() query: FilterListingDto) {
     return this.listingsService.filter(query);
+  }
+  @Post('/uploadImage')
+  @UseInterceptors(FileInterceptor('file'))
+  @ApiConsumes('multipart/form-data')
+  @ApiBody({
+    schema: {
+      type: 'object',
+      properties: {
+        file: {
+          type: 'string',
+          format: 'binary',
+        },
+        listingId: {
+          type: 'string',
+          description: 'The ID of the listing to associate the image with',
+        },
+      },
+      required: ['file', 'listingId'],
+    },
+  })
+  uploadImage(
+    @UploadedFile() file: Express.Multer.File,
+    @Body('listingId') listingId: string,
+  ) {
+    return this.listingsService.handleFileUpload(file, listingId);
   }
 }

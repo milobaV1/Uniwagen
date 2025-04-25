@@ -10,6 +10,8 @@ import { UsersModule } from './modules/users/users.module';
 import { ListingsModule } from './modules/listings/listings.module';
 import { MailerModule } from '@nestjs-modules/mailer';
 import { TransactionsModule } from './modules/transactions/transactions.module';
+import { ServeStaticModule } from '@nestjs/serve-static';
+import { join } from 'path';
 
 @Module({
   imports: [
@@ -29,6 +31,10 @@ import { TransactionsModule } from './modules/transactions/transactions.module';
           pass: process.env.EMAIL_PASSWORD,
         },
       },
+    }),
+    ServeStaticModule.forRoot({
+      rootPath: join(__dirname, '..', 'uploads'),
+      serveRoot: '/v1/uploads',
     }),
   ],
   controllers: [AppController],

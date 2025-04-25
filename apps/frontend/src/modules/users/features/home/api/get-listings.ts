@@ -1,18 +1,5 @@
 import { axiosClient } from "@/lib/api/axios-instance";
-import { User } from "../interface";
-
-export type ListingsResponse = {
-  id: string;
-  title: string;
-  description: string;
-  price: number;
-  category: string;
-  imageUrl: string[];
-  contactEmail: string;
-  contactPhone: string;
-  isSold: string;
-  user: User;
-};
+import { ListingsResponse } from "@/services/types/listing.type";
 
 export async function getListings(): Promise<ListingsResponse[] | undefined> {
   const client = axiosClient();
@@ -22,6 +9,19 @@ export async function getListings(): Promise<ListingsResponse[] | undefined> {
     return response.data as ListingsResponse[];
   } catch (error) {
     console.error("Get listing error", error);
+  }
+  return undefined;
+}
+
+export async function getUserListings(
+  userId: string
+): Promise<ListingsResponse[] | undefined> {
+  const client = axiosClient();
+  try {
+    const { data } = await client.get(`/listings/get-user-listings/${userId}`);
+    return data as ListingsResponse[];
+  } catch (error) {
+    console.error("Get user listing error: ", error);
   }
   return undefined;
 }
